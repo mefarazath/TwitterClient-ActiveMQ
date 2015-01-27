@@ -19,7 +19,7 @@ public class StatusHandler implements StatusListener{
 	 *
 	 * @param JMSUrl String | URL of the JMS Broker to send the messages to
 	 */
-	public StatusHandler(String JMSUrl, String queueName) throws JMSException {
+	public StatusHandler(String JMSUrl, String topicName) throws JMSException {
 		// create the factory for ActiveMQ connection
 		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(JMSUrl);
 		Connection connection = factory.createConnection();
@@ -30,10 +30,10 @@ public class StatusHandler implements StatusListener{
 		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
 		// Create a reference to the queue test_queue in this session.
-		Queue queue = session.createQueue(queueName);
+		Topic topic = session.createTopic(topicName);
 
 		// Create a producer for queue
-		producer = session.createProducer(queue);
+		producer = session.createProducer(topic);
 		logger.info("ActiveMQ producer successfully created for TwitterStreamer");
 	}
 
