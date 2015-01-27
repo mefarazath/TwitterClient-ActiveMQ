@@ -1,3 +1,4 @@
+
 package org.wso2.cep.uima.demo.Util;
 
 import org.apache.log4j.Logger;
@@ -19,12 +20,13 @@ import static java.lang.System.exit;
  * Created by Vidura on 1/23/15.
  */
 
-public class TwitterConfigurationBuiler {
-    private static String CONFIGURATION_FILE = "twitterConfig.xml";
-    private static Logger logger = Logger.getLogger(TwitterConfigurationBuiler.class);
+public class TwitterConfigurationBuilder {
+
+    private static String PARAM_CONFIGURATION_FILE = "twitterConfig.xml";
+    private static Logger logger = Logger.getLogger(TwitterConfigurationBuilder.class);
 
 
-    private TwitterConfigurationBuiler(){
+    private TwitterConfigurationBuilder(){
 
     }
 
@@ -35,7 +37,7 @@ public class TwitterConfigurationBuiler {
     public static TwitterConfiguration getTwitterConfiguration(){
 
         TwitterConfiguration twitterConfiguration = new TwitterConfiguration();
-        File xmlFile = new File(CONFIGURATION_FILE);
+        File xmlFile = new File(PARAM_CONFIGURATION_FILE);
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = null;
@@ -43,7 +45,7 @@ public class TwitterConfigurationBuiler {
         try {
             dBuilder = dbFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            logger.error("Error When Configuring the parser for "+TwitterConfigurationBuiler.class.getName(),e);
+            logger.error("Error When Configuring the parser for "+TwitterConfigurationBuilder.class.getName(),e);
             exit(1);
         }
         Document doc = null;
@@ -62,19 +64,24 @@ public class TwitterConfigurationBuiler {
 
         //get API keys
         NodeList nodeList = doc.getElementsByTagName("TwitterAPIKeys");
-        Node nNode = nodeList.item(0);
+        Node apiKeysNode = nodeList.item(0);
+        Element element = (Element) apiKeysNode;
 
-        Element eElement = (Element) nNode;
-        twitterConfiguration.setConsumerKey(eElement.getElementsByTagName("consumerKey").item(0).getTextContent());
-        twitterConfiguration.setConsumerSecret(eElement.getElementsByTagName("consumerSecret").item(0).getTextContent());
-        twitterConfiguration.setAccessToken(eElement.getElementsByTagName("accessToken").item(0).getTextContent());
-        twitterConfiguration.setAccessTokenSecret(eElement.getElementsByTagName("accessTokenSecret").item(0).getTextContent());
+        twitterConfiguration.setConsumerKey(element.getElementsByTagName("consumerKey").item(0).getTextContent());
+        twitterConfiguration.setConsumerSecret(element.getElementsByTagName("consumerSecret").item(0).getTextContent());
+        twitterConfiguration.setAccessToken(element.getElementsByTagName("accessToken").item(0).getTextContent());
+        twitterConfiguration.setAccessTokenSecret(element.getElementsByTagName("accessTokenSecret").item(0).getTextContent());
 
         //get user to search for
-        NodeList nodeList2 = doc.getElementsByTagName("TwitterConfiguration");
-        Node userToSearchNode = nodeList2.item(0);
-        Element userToSearchElement = (Element) userToSearchNode;
-        twitterConfiguration.setUserToSearch(userToSearchElement.getElementsByTagName("userToSearch").item(0).getTextContent());
+        NodeList nodeList2 = doc.getElementsByTagName("SearchConfiguration");
+        Node searchConfigNode = nodeList2.item(0);
+
+        element = (Element)searchConfigNode;
+
+        twitterConfiguration.setUserToSearch(element.getElementsByTagName("userToSearch").item(0).getTextContent());
+
+        int maxTweetCount = Integer.parseInt(element.getElementsByTagName("maxTweetCount").item(0).getTextContent());
+        twitterConfiguration.setMaxTweets(maxTweetCount);
 
         NodeList nodeList3 = doc.getElementsByTagName("StreamingConfiguration");
         Node followersNode = nodeList3.item(0);

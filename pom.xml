@@ -7,7 +7,8 @@
 
     <artifactId>org.wso2.cpe.uima.twitter-extractor</artifactId>
 	<groupId>org.wso2.cep.uima</groupId>
-        <version>1.0</version>
+    <version>1.0</version>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -19,6 +20,27 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-all</artifactId>
             <version>5.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-stream</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-async</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>org.junit</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org</groupId>
+            <artifactId>org.junit4</artifactId>
+            <version>4.8.1.v20120523-1257-wso2v1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -40,7 +62,6 @@
                     <arguments>
                         <argument>tcp://localhost:61616</argument>
                         <argument>TwitterExtractedFeed</argument>
-                        <argument>road_lk</argument>
                     </arguments>
                 </configuration>
             </plugin>

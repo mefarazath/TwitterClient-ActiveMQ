@@ -4,7 +4,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.log4j.PropertyConfigurator;
 import org.wso2.cep.uima.demo.Util.Tweet;
 import org.wso2.cep.uima.demo.Util.TwitterConfiguration;
-import org.wso2.cep.uima.demo.Util.TwitterConfigurationBuiler;
+import org.wso2.cep.uima.demo.Util.TwitterConfigurationBuilder;
 import org.xml.sax.SAXException;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
@@ -28,6 +28,7 @@ public class TweetExtractor {
     private String userToSearch;
     private String JMSUrl;
     private String queueName;
+    private int maxTweets;
 
 
     public TweetExtractor(String JMSUrl, String queueName) throws ParserConfigurationException, SAXException, IOException {
@@ -45,8 +46,8 @@ public class TweetExtractor {
     public static void main(String[] args) throws JMSException, IOException, SAXException, ParserConfigurationException {
 
         if(args.length != 2 || args[0].equals("") || args[1].equals("")){
-            System.out.println("Usage ant -DjmsUrl=<JMS_URL> -DqueueName=<QUEUE_NAME>");
-            System.exit(0);
+            System.out.println("Usage ant -DjmsUrl=<JMS_URL> -DtopicName=<TOPIC_NAME>");
+            throw new NullPointerException("Insufficient Arguments for "+TweetExtractor.class.getName()+" to run");
         }
 
 
@@ -157,13 +158,17 @@ public class TweetExtractor {
         cb = new ConfigurationBuilder();
         Logger.getLogger(TweetExtractor.class).debug("Building Configuration");
 
-        TwitterConfiguration config = TwitterConfigurationBuiler.getTwitterConfiguration();
+        TwitterConfiguration config = TwitterConfigurationBuilder.getTwitterConfiguration();
 
         String consumerKey = config.getConsumerKey();
         String consumerSecret = config.getConsumerSecret();
         String accessToken = config.getAccessToken();
         String accessTokenSecret = config.getAccessTokenSecret();
         userToSearch = config.getUserToSearch();
+        maxTweets = config.getMaxTweets();
+
+        logger.warn("Max Count Set : "+maxTweets);
+
 
         if(consumerKey == null || consumerSecret == null || accessToken == null || accessTokenSecret == null) {
             logger.error("Twitter API Keys have not been set properly in twitterConfig.xml");

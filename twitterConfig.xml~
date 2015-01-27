@@ -11,12 +11,13 @@
 	</TwitterAPIKeys>
 	
 	<!-- 
-		Username or Twitter Handle of the user you want to extract tweets from
-		Applicable only if you are running the client in Search mode
+		Search configuration params are in effect if you are running the client in extraction mode
 	-->
 	<SearchConfiguration>
+		<!-- Username/Tweet handle of the user to search-->
 		<userToSearch>road_lk</userToSearch>
-		<maxTweets>200</maxTweets>  <!-- Maximum Number of Tweets to extract from the timeline-->
+		 <!-- Maximum Number of Tweets to extract from the timeline-->
+		<maxTweets>200</maxTweets> 
 	</SearchConfiguration>
 
  

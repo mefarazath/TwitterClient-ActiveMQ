@@ -17,13 +17,12 @@
 		<!-- Username/Tweet handle of the user to search-->
 		<userToSearch>road_lk</userToSearch>
 		 <!-- Maximum Number of Tweets to extract from the timeline-->
-		<maxTweets>200</maxTweets> 
+		<maxTweetCount>200</maxTweetCount>
 	</SearchConfiguration>
 
  
 	<!-- 
-		UserIDs of the users you want to filter the twitterStream for
-		Applicable only if you are running the client in the Streaming mode
+		Search configuration params are in effect if you are running the client in extraction mode
 	-->
 	<StreamingConfiguration>
 		<followers>711930980,808888003,4366881,2984541727</followers>

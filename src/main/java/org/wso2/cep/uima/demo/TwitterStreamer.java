@@ -2,7 +2,7 @@ package org.wso2.cep.uima.demo;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.wso2.cep.uima.demo.Util.TwitterConfiguration;
-import org.wso2.cep.uima.demo.Util.TwitterConfigurationBuiler;
+import org.wso2.cep.uima.demo.Util.TwitterConfigurationBuilder;
 import org.xml.sax.SAXException;
 import twitter4j.FilterQuery;
 import twitter4j.Logger;
@@ -44,7 +44,7 @@ public class TwitterStreamer {
 		System.exit(0);
 	}
 
-        TwitterConfiguration config = TwitterConfigurationBuiler.getTwitterConfiguration();
+        TwitterConfiguration config = TwitterConfigurationBuilder.getTwitterConfiguration();
 
         // create a streamer object
         TwitterStreamer streamer = new TwitterStreamer(config.getFollowers(), JMSUrl);

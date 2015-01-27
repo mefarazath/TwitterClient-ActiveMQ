@@ -10,6 +10,7 @@ public class TwitterConfiguration {
     private String accessToken;
     private String accessTokenSecret;
     private String userToSearch;
+    private int maxTweets;
     private long[] followers;
 
     TwitterConfiguration(){
@@ -40,19 +41,22 @@ public class TwitterConfiguration {
     public void setAccessTokenSecret(String accessTokenSecret) {
         this.accessTokenSecret = accessTokenSecret;
     }
-
     public String getUserToSearch() {
         return userToSearch;
     }
     public void setUserToSearch(String userToSearch) {
         this.userToSearch = userToSearch;
     }
-
     public long[] getFollowers() {
         return followers;
     }
-
     public void setFollowers(long[] followers) {
         this.followers = followers;
+    }
+    public int getMaxTweets() {
+        return maxTweets;
+    }
+    public void setMaxTweets(int maxTweets) {
+        this.maxTweets = maxTweets;
     }
 }

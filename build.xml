@@ -1,7 +1,7 @@
 
 <project default="run">
     <property name="jmsUrl" value=""/>
-    <property name="queueName" value=""/>
+    <property name="topicName" value=""/>
     <property name="lib.dir" value="lib"/>
     <property name="class.dir" value="build/classes"/>
 
@@ -50,10 +50,8 @@
     <target name="run" depends="compile">
         <java classname="${mainClass}"
               classpathref="javac.classpath" fork="true">
-            <sysproperty key="jmsUrl" value="${jmsUrl}"/>
-            <sysproperty key="queueName" value="${queueName}"/>
-	    <arg value="${jmsUrl}"/>
-            <arg value="${queueName}"/>
+	        <arg value="${jmsUrl}"/>
+            <arg value="${topicName}"/>
         </java>
     </target>
 
