@@ -57,10 +57,10 @@ public class TwitterStreamer {
                                             SAXException, ParserConfigurationException {
 
         String JMSUrl = args[0];
-        String queueName = args[1];
+        String topicName = args[1];
 
-	if(JMSUrl.equals("") || queueName.equals("")){
-		System.out.println("Usage ant -DjmsUrl=<JMS_URL> -DqueueName=<QUEUE_NAME>");
+	if(JMSUrl.equals("") || topicName.equals("")){
+		System.out.println("Usage ant -DjmsUrl=<JMS_URL> -DtopicName=<TOPIC_NAME>");
 		System.exit(0);
 	}
 
@@ -74,7 +74,7 @@ public class TwitterStreamer {
         streamer.setAccessTokenSecret(config.getAccessTokenSecret());
 
         // create the status handler of the stream
-        StatusHandler statusHandler = new StatusHandler(JMSUrl, queueName);
+        StatusHandler statusHandler = new StatusHandler(JMSUrl, topicName);
 
         // start streaming for tweets
         streamer.startStream(statusHandler);

@@ -47,20 +47,18 @@ public class TweetExtractor {
     private static Logger logger = Logger.getLogger(TweetExtractor.class);
     private String userToSearch;
     private String JMSUrl;
-    private String queueName;
+    private String topicName;
     private int maxTweets;
 
 
-    public TweetExtractor(String JMSUrl, String queueName) throws ParserConfigurationException, SAXException, IOException {
-
+    public TweetExtractor(String JMSUrl, String topicName) throws ParserConfigurationException, SAXException, IOException {
+        PropertyConfigurator.configure("src/main/resources/log4j.properties");
         this.JMSUrl = JMSUrl;
-        this.queueName = queueName;
+        this.topicName = topicName;
 
         buildConfiguration();   // set the API keys to the Config Builder
         TwitterFactory tf = new TwitterFactory(cb.build());
         twitterApp = tf.getInstance();
-
-        PropertyConfigurator.configure("src/main/resources/log4j.properties");
     }
 
     public static void main(String[] args) throws JMSException, IOException, SAXException, ParserConfigurationException {
@@ -72,26 +70,27 @@ public class TweetExtractor {
 
 
         TweetExtractor extractor = new TweetExtractor(args[0],args[1]);
-        extractor.retrieveTweets();
+        extractor.retrieveTweets(extractor.maxTweets);
         logger.info("Total Tweets Extracted: " + extractor.tweetList.size());
 
         // create the factory for ActiveMQ connection
         ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(extractor.JMSUrl);
         Connection connection = factory.createConnection();
+        connection.setClientID(extractor.getClientID());
         connection.start();
-        logger.info("ActiveMQ connection started for TweetExtractor successfully");
+        logger.debug("ActiveMQ connection started for TweetExtractor successfully");
 
         // Create a non-transactional session with automatic acknowledgement
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         // Create a reference to the queue test_queue in this session.
-        Queue queue = session.createQueue(extractor.queueName);
+        Topic topic = session.createTopic(extractor.topicName);
 
         // Create a producer for queue
-        MessageProducer producer = session.createProducer(queue);
-        logger.info("ActiveMQ producer successfully created for TwitterExtractor");
+        MessageProducer producer = session.createProducer(topic);
+        logger.debug("ActiveMQ producer successfully created for TwitterExtractor");
 
-        logger.info("ActiveMQ producer enqueuing extracted Tweets");
+        logger.debug("ActiveMQ producer enqueuing extracted Tweets");
 
         for(Tweet t: extractor.tweetList){
             TextMessage tweetMessage = session.createTextMessage(t.getText());
@@ -102,50 +101,63 @@ public class TweetExtractor {
         logger.info("ActiveMQ Tweet Extractor enqueued "+extractor.tweetList.size()+" messages");
         // Stop the connection — good practice but redundant here
         producer.close();
-        logger.info("Producer Closed");
+        logger.debug("Producer Closed");
         connection.stop();
-        logger.info("Connection Stopped");
+        logger.debug("Connection Stopped");
 
         System.exit(0);
     }
 
 
+    private String getClientID(){
+        int hashcode = this.hashCode();
+        return hashcode+"";
+    }
+
     /***
-     * Method to retrieve tweets from the userToSearch user's timeline
-     * Only a maximum of ~3200 tweets can be extracted due to API limitations
+     *
      */
-    private void retrieveTweets(){
+    private void retrieveTweets(int maxTweets){
 
         Paging paging;
 
         // set the lowest value of the tweet ID initially to one less than Long.MAX_VALUE
         long min_id = Long.MAX_VALUE - 1;
-        int count;
+        int count=0;
         int index = 0;
+        boolean maxValueReached = false;
 
-        logger.info("Started Extracting Tweets of "+ userToSearch);
-        // iterate through the timeline until the iteration returns no tweets
+
+        logger.info("Started Extracting Tweets of user: "+ userToSearch);
+        // iterate through the timeline untill the iteration returns no tweets
+
         while (true) {
             try {
 
-                count = tweetList.size();
+                //count = tweetList.size();
 
                 // paging tweets at a rate of 100 per page
                 paging = new Paging(1, 100);
 
                 // if this is not the first iteration set the new min_id value for the page
-                if (count != 0)
-                    logger.info("Extracted Tweet Count : "+count);
+                if (count != 0) {
+                    logger.info("Extracted Tweet Count : " + count);
                     paging.setMaxId(min_id - 1);
+                }
 
                 // get a page of the tweet timeline with tweets with ids less than the min_id value
-                List<Status> results = twitterApp.getUserTimeline(userToSearch, paging);
+                List<Status> tweetTempList = twitterApp.getUserTimeline(userToSearch, paging);
 
                 // iterate the results and add to tweetList
-                for (Status s : results) {
+                for (Status s : tweetTempList) {
+                    if(count == maxTweets){
+                            maxValueReached = true;
+                            break;
+                    }
+                    count++;
                     Tweet tweet = new Tweet(s.getId(),s.getCreatedAt(),s.getText());
                     tweetList.add(tweet);
-                    Logger.getLogger(TweetExtractor.class).debug(" " + (index++) + " " + tweet.toString());
+                    logger.debug(" " + (index++) + " " + tweet.toString());
 
                     // set the value for the min value for the next iteration
                     if (s.getId() < min_id) {
@@ -155,7 +167,7 @@ public class TweetExtractor {
 
                 // if the results for this iteration is zero, means we have reached the API limit or we have extracted the maximum
                 // possible, so break
-                if (results.size() == 0) {
+                if (tweetTempList.size() == 0 || maxValueReached) {
                     break;
                 }
 
@@ -187,7 +199,7 @@ public class TweetExtractor {
         userToSearch = config.getUserToSearch();
         maxTweets = config.getMaxTweets();
 
-        logger.warn("Max Count Set : "+maxTweets);
+        logger.info("Maximum Number of Tweets to extract: " + maxTweets);
 
 
         if(consumerKey == null || consumerSecret == null || accessToken == null || accessTokenSecret == null) {
