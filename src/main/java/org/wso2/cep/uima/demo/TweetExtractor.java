@@ -124,7 +124,7 @@ public class TweetExtractor {
         int index = 0;
 
         logger.info("Started Extracting Tweets of "+ userToSearch);
-        // iterate through the timeline untill the iteration returns no tweets
+        // iterate through the timeline until the iteration returns no tweets
         while (true) {
             try {
 
